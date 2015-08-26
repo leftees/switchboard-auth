@@ -1,0 +1,109 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<dom-module id="switchboard-auth">
+    <style>
+
+    </style>
+    <template>
+        <!-- TODO: I feel like this is more clear than changing the URL on a single tag, but is it wasteful? -->
+        <iron-ajax auto url="{{profileUrl}}" handle-as="json" on-response="profileResponse"></iron-ajax>
+        <iron-ajax id="authAjax" url="{{authUrl}}" handle-as="json" on-response="authResponse"></iron-ajax>
+    </template>
+    <script>
+    var baseUrl = "http://localhost:5000/api";
+    Polymer({
+        is: 'switchboard-auth',
+        properties: {
+            profileUrl: {
+                type: String,
+                value: baseUrl + "/profile",
+                readOnly: true
+            },
+            profile: {
+                type: Object
+            },
+            authUrl: {
+                type: String,
+                computed: "computeAuthUrl(service, profile)",
+                notify: true
+            },
+            service: {
+                type: String
+            },
+            prompt: {
+                type: Boolean,
+                value: true
+            },
+            auto: {
+                type: Boolean,
+                value: false
+            },
+            redirectUrl: {
+                type: String,
+                reflectToAttribute: true,
+                notify: true
+            },
+            waitUrl: {
+            	type: String,
+            	reflectToAttribute: true
+            }
+        },
+        
+        computeAuthUrl: function(service, profile) {
+            if (profile === undefined ||
+                profile.user === undefined ||
+                profile.authenticated === false ||
+                profile.user.apikey === undefined) {
+                return;
+            }
+
+            var url = baseUrl + "/service/" + service + "/auth?apikey=" + profile.user.apikey;
+            console.log("computeAuthUrl:", url);
+
+            if (this.auto) {
+                this.authUrl = url;
+                this.doAuth();
+            }
+
+            return url;
+        },
+
+        doAuth: function() {
+            // TODO: should block on profile request or fail if it failed
+            // TODO: other forms of authentication other than profile?
+            console.log("Profile:", this.profile);
+            if (this.authUrl === undefined) {
+                console.log("ERROR: authUrl was undefined at the time of the doAuth() call");
+                return;
+            }
+
+            // trigger iron-ajax request
+            this.$.authAjax.generateRequest();
+        },
+
+        profileResponse: function(e) {
+            var profile = e.target.lastResponse;
+            console.log("Got profile:", profile);
+            if (profile !== undefined) {
+                console.log("Setting profile");
+                this.profile = profile;
+            }
+        },
+
+        authResponse: function(e) {
+        	var response = e.target.lastResponse;
+            console.log("Got auth response:", e.target.lastResponse);
+            if (response === undefined) {
+            	return;
+            }
+
+            if (response.redirect !== undefined) {
+            	console.log ("Setting redirectUrl to:", response.redirect);
+            	// TODO: manage final result callback URL by appending it to the response.redirect here
+            	this.redirectUrl = response.redirect;
+            	this.waitUrl = response.waitUrl;
+            }
+        }
+    });
+    </script>
+</dom-module>

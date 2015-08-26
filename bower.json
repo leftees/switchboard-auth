@@ -1,0 +1,22 @@
+{
+  "name": "switchboard-auth",
+  "version": "0.0.0",
+  "authors": [
+    "Adam Powers <apowers@ato.ms>"
+  ],
+  "description": "Polymer component for Switchboard authentication",
+  "main": "switchboard-auth.html",
+  "keywords": [
+    "web-components",
+    "Polymer",
+    "switchboard"
+  ],
+  "license": "none",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
