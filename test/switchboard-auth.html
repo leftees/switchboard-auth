@@ -13,16 +13,91 @@
 </head>
 
 <body>
-    <test-fixture id="basic">
+    <test-fixture id="dev">
+        <template>
+            <switchboard-auth dev></switchboard-auth>
+        </template>
+    </test-fixture>
+    <test-fixture id="prod">
         <template>
             <switchboard-auth></switchboard-auth>
         </template>
     </test-fixture>
+    <test-fixture id="gdrive">
+        <template>
+            <switchboard-auth service="google_drive"></switchboard-auth>
+        </template>
+    </test-fixture>
+    <test-fixture id="gdrive">
+        <template>
+            <switchboard-auth service="google_drive" redirect-url="{{foo}}"></switchboard-auth>
+        </template>
+    </test-fixture>
     <script>
+    var responseHeaders = {
+        json: {
+            'Content-Type': 'application/json'
+        },
+        plain: {
+            'Content-Type': 'text/plain'
+        }
+    };
+
+    var profile = {
+        "succes": true,
+        "result": "success",
+        "err": null,
+        "msg": "Found your profile",
+        "user": {
+            "username": "apowers",
+            "email": "apowers@ato.ms",
+            "apikey": "ee6974f1-409e-46db-8124-f8aeaead2451",
+            "createdAt": "2015-08-21T22:21:09.018Z",
+            "updatedAt": "2015-08-21T22:21:09.018Z",
+            "id": "55d7a455acc02aa0277721f0"
+        },
+        "authenticated": true
+    };
+
     suite('basic', function() {
-        test("Testing");
-        test("basic test", function() {
-            var input = fixture('basic');
+        setup(function() {
+            server = sinon.fakeServer.create();
+            server.respondWith("GET", "/api/service/google_drive/auth", [
+                200,
+                responseHeaders.json,
+                '{"success": "true"}'
+            ]);
+            server.respondWith("GET", "/api/profile", [
+                200,
+                responseHeaders.json,
+                // JSON.stringify (profile)
+                '{"success": "true"}'
+            ]);
+        });
+
+        teardown(function() {
+            server.restore();
+        });
+
+        test("dev URL test", function() {
+            var auth = fixture('dev');
+
+            assert.strictEqual(auth.baseUrl, "http://localhost:5000/api", "Expected dev URL");
+        });
+
+        test("normal base URL test", function() {
+            var auth = fixture('prod');
+
+            assert.strictEqual(auth.baseUrl, "http://switchboard.center/api", "Expected dev URL");
+        });
+
+        test("service name", function() {
+            var auth = fixture('gdrive');
+            var authUrl = "http://switchboard.center/api/service/google_drive/auth?apikey=ee6974f1-409e-46db-8124-f8aeaead2451";
+
+            assert.strictEqual(auth.service, "google_drive", "service should be 'google_drive'");
+            // assert.deepEqual(auth.profile, profile, "should get a profile");
+            // assert.strictEqual (auth.authUrl, authUrl, "authUrl should exist and have the right pieces");
         });
     });
     </script>

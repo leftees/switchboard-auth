@@ -10,13 +10,15 @@
         <iron-ajax id="authAjax" url="{{authUrl}}" handle-as="json" on-response="authResponse"></iron-ajax>
     </template>
     <script>
-    var baseUrl = "http://localhost:5000/api";
+    // var baseUrl = "http://localhost:5000/api";
     Polymer({
         is: 'switchboard-auth',
         properties: {
             profileUrl: {
                 type: String,
-                value: baseUrl + "/profile",
+                value: function() {
+                    return this.baseUrl + "/profile";
+                },
                 readOnly: true
             },
             profile: {
@@ -44,11 +46,24 @@
                 notify: true
             },
             waitUrl: {
-            	type: String,
-            	reflectToAttribute: true
+                type: String,
+                reflectToAttribute: true
+            },
+            baseUrl: {
+                type: String,
+                computed: "computeBaseUrl(dev)"
+            },
+            dev: {
+                type: Boolean,
+                value: false
             }
         },
-        
+
+        computeBaseUrl: function(dev) {
+            if (dev) return "http://localhost:5000/api";
+            else return "http://switchboard.center/api";
+        },
+
         computeAuthUrl: function(service, profile) {
             if (profile === undefined ||
                 profile.user === undefined ||
@@ -57,7 +72,7 @@
                 return;
             }
 
-            var url = baseUrl + "/service/" + service + "/auth?apikey=" + profile.user.apikey;
+            var url = this.baseUrl + "/service/" + service + "/auth?apikey=" + profile.user.apikey;
             console.log("computeAuthUrl:", url);
 
             if (this.auto) {
@@ -91,17 +106,17 @@
         },
 
         authResponse: function(e) {
-        	var response = e.target.lastResponse;
+            var response = e.target.lastResponse;
             console.log("Got auth response:", e.target.lastResponse);
             if (response === undefined) {
-            	return;
+                return;
             }
 
             if (response.redirect !== undefined) {
-            	console.log ("Setting redirectUrl to:", response.redirect);
-            	// TODO: manage final result callback URL by appending it to the response.redirect here
-            	this.redirectUrl = response.redirect;
-            	this.waitUrl = response.waitUrl;
+                console.log("Setting redirectUrl to:", response.redirect);
+                // TODO: manage final result callback URL by appending it to the response.redirect here
+                this.redirectUrl = response.redirect;
+                this.waitUrl = response.waitUrl;
             }
         }
     });

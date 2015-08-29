@@ -10,14 +10,14 @@
 
 
 module.exports = {
-    verbose: true,
+    verbose: false,
     plugins: {
         local: {
             // browsers: ['chrome', 'firefox', 'safari']
             // browsers: ['default']
         },
         sauce: {
-        	name: "switchboard-auth " + new Date().toLocaleString(),
+        	name: "switchboard-auth :: " + require("os").hostname() + " :: " + new Date().toLocaleString(),
             disabled: false,
             // browsers: ['chrome', 'firefox', 'safari', 'ie']
             // browsers: ['default']
