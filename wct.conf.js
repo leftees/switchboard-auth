@@ -17,7 +17,7 @@ module.exports = {
             // browsers: ['default']
         },
         sauce: {
-        	name: "switchboard-auth " + new Date().getTime(),
+        	name: "switchboard-auth " + new Date().toLocaleString(),
             disabled: false,
             // browsers: ['chrome', 'firefox', 'safari', 'ie']
             // browsers: ['default']
