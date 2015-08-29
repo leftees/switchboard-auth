@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "postinstall": "./node_modules/bower/bin/bower install && ln -s . ./bower_components/switchboard-auth",
-    "test": "./bower_components/switchboard-auth && wct --sauce"
+    "postinstall": "./node_modules/.bin/bower install && ln -s `pwd` ./bower_components/switchboard-auth",
+    "test": "./bower_components/switchboard-auth && ../../node_modules/.bin/wct --sauce"
   },
   "repository": {
     "type": "git",
