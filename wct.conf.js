@@ -18,6 +18,8 @@ module.exports = {
         },
         sauce: {
         	name: "switchboard-auth :: " + require("os").hostname() + " :: " + new Date().toLocaleString(),
+            build: process.env.TRAVIS_BUILD_NUMBER,
+            tag: process.env.TRAVIS_BRANCH || process.env.TRAVIS_PULL_REQUEST,
             disabled: false,
             // browsers: ['chrome', 'firefox', 'safari', 'ie']
             // browsers: ['default']
