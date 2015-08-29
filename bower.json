@@ -18,5 +18,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.1",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0"
+  }
 }

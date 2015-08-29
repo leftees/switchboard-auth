@@ -1,0 +1,27 @@
+{
+  "name": "switchboard-auth",
+  "version": "0.1.0",
+  "description": "",
+  "main": "switchboard-auth.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "postinstall": "./node_modules/bower/bin/bower install && ln -s . ./bower_components/switchboard-auth",
+    "test": "./bower_components/switchboard-auth && wct --sauce"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apowers313/switchboard-auth.git"
+  },
+  "author": "apowers@ato.ms",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apowers313/switchboard-auth/issues"
+  },
+  "homepage": "https://github.com/apowers313/switchboard-auth#readme",
+  "dependencies": {
+    "bower": "^1.5.2",
+    "web-component-tester": "^3.3.15"
+  }
+}
