@@ -16,6 +16,7 @@
   },
   "author": "apowers@ato.ms",
   "license": "MIT",
+  "loglevel": "info",
   "bugs": {
     "url": "https://github.com/apowers313/switchboard-auth/issues"
   },
