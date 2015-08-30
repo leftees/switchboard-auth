@@ -8,7 +8,9 @@
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install && ln -s `pwd` ./bower_components/switchboard-auth",
-    "test": "cd ./bower_components/switchboard-auth && ./node_modules/.bin/wct --simpleOutput --sauce default"
+    "test": "cd ./bower_components/switchboard-auth && ./node_modules/.bin/wct --simpleOutput --sauce default",
+    "testserver": "cd ../.. && python -m SimpleHTTPServer 8000",
+    "testbrowser": "open http://localhost:8000/bower_components/switchboard-auth/test/"
   },
   "repository": {
     "type": "git",

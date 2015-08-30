@@ -8,27 +8,18 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../test-fixture/test-fixture-mocha.js"></script>
+    <link rel="import" href="../../polymer/polymer.html">
     <link rel="import" href="../../test-fixture/test-fixture.html">
     <link rel="import" href="../switchboard-auth.html">
 </head>
 
 <body>
-    <test-fixture id="dev">
-        <template>
-            <switchboard-auth dev></switchboard-auth>
-        </template>
-    </test-fixture>
-    <test-fixture id="prod">
-        <template>
-            <switchboard-auth></switchboard-auth>
-        </template>
-    </test-fixture>
     <test-fixture id="gdrive">
         <template>
             <switchboard-auth service="google_drive"></switchboard-auth>
         </template>
     </test-fixture>
-    <test-fixture id="gdrive">
+    <test-fixture id="redir">
         <template>
             <switchboard-auth service="google_drive" redirect-url="{{foo}}"></switchboard-auth>
         </template>
@@ -44,7 +35,7 @@
     };
 
     var profile = {
-        "succes": true,
+        "success": true,
         "result": "success",
         "err": null,
         "msg": "Found your profile",
@@ -60,44 +51,53 @@
     };
 
     suite('basic', function() {
+        var server;
+
         setup(function() {
             server = sinon.fakeServer.create();
-            server.respondWith("GET", "/api/service/google_drive/auth", [
-                200,
-                responseHeaders.json,
-                '{"success": "true"}'
-            ]);
-            server.respondWith("GET", "/api/profile", [
-                200,
-                responseHeaders.json,
-                // JSON.stringify (profile)
-                '{"success": "true"}'
-            ]);
+            server.autoRespond = true;
+            server.autoRespondAfter = 0;
         });
 
         teardown(function() {
             server.restore();
         });
 
-        test("dev URL test", function() {
-            var auth = fixture('dev');
-
-            assert.strictEqual(auth.baseUrl, "http://localhost:5000/api", "Expected dev URL");
-        });
-
-        test("normal base URL test", function() {
-            var auth = fixture('prod');
-
-            assert.strictEqual(auth.baseUrl, "http://switchboard.center/api", "Expected dev URL");
-        });
-
-        test("service name", function() {
+        test("static-ish values are set right", function() {
             var auth = fixture('gdrive');
-            var authUrl = "http://switchboard.center/api/service/google_drive/auth?apikey=ee6974f1-409e-46db-8124-f8aeaead2451";
+            var profileUrl = "/api/profile";
 
             assert.strictEqual(auth.service, "google_drive", "service should be 'google_drive'");
-            // assert.deepEqual(auth.profile, profile, "should get a profile");
-            // assert.strictEqual (auth.authUrl, authUrl, "authUrl should exist and have the right pieces");
+            assert.strictEqual(auth.profileUrl, profileUrl, "profile URL should be set");
+        });
+
+        test("catch 'ready' when profile is loaded", function(done) {
+            server.respondWith ([200, { "Content-Type": "application/json" }, JSON.stringify(profile)]);
+            var auth = fixture('gdrive');
+            auth.addEventListener("ready", function() {
+                done();
+            });
+        });
+
+        test("get profile and set properties accordingly", function(done) {
+            var authUrl = "/api/service/google_drive/auth?apikey=ee6974f1-409e-46db-8124-f8aeaead2451";
+
+            server.respondWith ("GET", "/api/profile", [200, { "Content-Type": "application/json" }, JSON.stringify(profile)]);
+
+            var auth = fixture('gdrive');
+
+            auth.addEventListener("ready", function(e) {
+                assert.isObject (auth.profile, "Auth profile should be an object");
+                assert.deepEqual(auth.profile, profile, "should get a profile");
+                assert.strictEqual (auth.authUrl, authUrl, "auth URL should be set based on profile and service");
+                done();
+            });
+
+            auth.addEventListener("error", function(e) {
+                assert.fail(null, e, "shouldn't get error when waiting for profile:");
+                done();
+            });
+
         });
     });
     </script>

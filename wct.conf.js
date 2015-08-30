@@ -10,7 +10,9 @@
 
 
 module.exports = {
-    verbose: false,
+    verbose: true,
+    expanded: true,
+    simpleOutput: true,
     plugins: {
         local: {
             // browsers: ['chrome', 'firefox', 'safari']
